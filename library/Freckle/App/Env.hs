@@ -38,6 +38,7 @@ module Freckle.App.Env
   ) where
 
 import Prelude
+import Prelude qualified as Unsafe (read)
 
 import Control.Error.Util (note)
 import Data.Char (isDigit)
@@ -45,7 +46,6 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeM)
 import Env qualified
-import Prelude qualified as Unsafe (read)
 
 #if MIN_VERSION_envparse(0,5,2)
 import Data.Bifunctor (second)
@@ -108,8 +108,8 @@ eitherReader f s = first (unread . suffix) $ f s
 -- Left [("TIME",UnreadError "unable to parse time as %Y-%m-%d: \"10:00PM\"")]
 time :: String -> Env.Reader Error UTCTime
 time fmt =
-  eitherReader $
-    note ("unable to parse time as " <> fmt)
+  eitherReader
+    $ note ("unable to parse time as " <> fmt)
       . parseTimeM True defaultTimeLocale fmt
 
 -- | Read key-value pairs
@@ -156,7 +156,7 @@ splitOnParse c p = traverse p <=< splitOn c
 data Timeout
   = TimeoutSeconds Int
   | TimeoutMilliseconds Int
-  deriving stock (Show, Eq)
+  deriving stock (Eq, Show)
 
 -- | Read a timeout value as seconds or milliseconds
 --
